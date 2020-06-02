@@ -1,0 +1,11 @@
+
+pluginManagement {
+  repositories {
+    mavenLocal()
+    gradlePluginPortal()
+    maven { url 'https://dl.bintray.com/brambolt/public' }
+  }
+}
+
+rootProject.name = 'gradle-patching'
+

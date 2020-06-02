@@ -1,0 +1,14 @@
+**/*.iml
+**/*.log
+**/*.swo
+**/*.swp
+**/*__jb_tmp__*
+**/*-bkup
+**/build
+**/out
+.gradle
+.idea/dataSources/**/storage_v2/*
+.idea/libraries
+.idea/tasks.xml
+.idea/workspace.xml
+

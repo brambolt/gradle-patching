@@ -1,0 +1,33 @@
+
+buildscript {
+  repositories {
+    mavenLocal()
+    maven {
+      url "${artifactoryContextUrl}/${artifactoryRepoKey}"
+      credentials {
+        username artifactoryUser
+        password artifactoryToken
+      }
+    }
+    maven { url 'https://plugins.gradle.org/m2' }
+    mavenCentral()
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.brambolt.gradle:brambolt-gradle-patching:SNAPSHOT'
+  }
+} 
+
+apply plugin: 'com.brambolt.patching'
+
+processPatches {
+  content = "${project.buildDir}/tmp/fixture2/content"
+  patches = "${project.buildDir}/tmp/fixture2/patches"
+  doFirst {
+    copy {
+      from "${project.projectDir}/src/test/fixture2"
+      into "${project.buildDir}/tmp/fixture2"
+    }
+  }
+}
+

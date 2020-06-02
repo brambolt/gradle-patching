@@ -1,0 +1,42 @@
+
+plugins {
+  id 'com.brambolt.gradle.pluginbuild' version '2020.05.25-4031' apply false
+  id 'com.brambolt.gradle.testkit' version 'SNAPSHOT' apply false
+}
+
+description = 'A Gradle plug-in for creating and applying patch files using Google\'s diffutils library.'
+group = 'com.brambolt.gradle'
+
+ext {
+  artifactId = 'brambolt-gradle-patching'
+  developers = [[
+    email: 'stefan.sigurdsson@brambolt.com',
+    id: 'stefan.sigurdsson@brambolt.com',
+    name: 'Stefán Sigurðsson'
+  ]]
+  inceptionYear = '2017'
+  licenses = [[
+    id: 'Apache-2.0',
+    name: 'The Apache Software License, Version 2.0',
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+  ]]
+  pluginClass = 'com.brambolt.gradle.PatchingPlugin'
+  pluginDisplayName = 'Brambolt Patching plugin'
+  pluginId = 'com.brambolt.gradle.patching'
+  pluginTags = ['diffutils', 'unified', 'diff', 'patch']
+  pluginWebsite = 'https://github.com/brambolt/gradle-patching'
+  projectVersion = '2020.05.25'
+  vcsUrl = 'https://github.com/brambolt/gradle-patching'
+}
+
+apply plugin: 'com.brambolt.gradle.pluginbuild'
+apply plugin: 'com.brambolt.gradle.testkit'
+
+dependencies {
+  implementation 'com.googlecode.java-diff-utils:diffutils:1.3.0'
+  testImplementation 'com.brambolt.gradle:brambolt-gradle-testkit:SNAPSHOT'
+}
+
+processFixtures {
+  fixtures = ['fixture2']
+}

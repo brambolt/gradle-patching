@@ -1,0 +1,15 @@
+--- content/bin/standalone.sh	2020-05-27 08:49:38.766482201 +0200
++++ expected/bin/standalone.sh	2020-05-27 09:00:20.661467373 +0200
+@@ -325,6 +325,12 @@
+ echo ""
+ echo "  JAVA_OPTS: $JAVA_OPTS"
+ echo ""
++echo "  JAVA_TOOL_OPTIONS: $JAVA_OPTS"
++echo ""
++echo "  _JAVA_OPTIONS: $JAVA_OPTS"
++echo ""
++echo "  IBM_JAVA_OPTIONS: $JAVA_OPTS"
++echo ""
+ echo "========================================================================="
+ echo ""
+ 
