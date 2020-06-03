@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Use --debug to activate debug mode with an optional argument to specify the port.
+# Usage : standalone.sh --debug
+#         standalone.sh --debug 9797
+
+# By default debug mode is disabled.
+DEBUG_MODE="${DEBUG:-false}"
+DEBUG_PORT="${DEBUG_PORT:-8787}"
+GC_LOG="$GC_LOG"
+SERVER_OPTS=""
+while [ "$#" -gt 0 ]
+do
+    case "$1" in
+      --debug)
+          DEBUG_MODE=true
+          if [ -n "$2" ] && [ "$2" = `echo "$2" | sed 's/-//'` ]; then
+              DEBUG_PORT=$2
+              shift
+          fi
+          ;;
+      -Djava.security.manager*)
+          echo "ERROR: The use of -Djava.security.manager has been removed. Please use the -secmgr command line argument or SECMGR=true environment variable."
+          exit 1
+          ;;
+      -secmgr)
+          SECMGR="true"
+          ;;
+      --)
+          shift
+          break;;
+      *)
+          SERVER_OPTS="$SERVER_OPTS '$1'"
+          ;;
+    esac
+    shift
+done

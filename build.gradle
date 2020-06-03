@@ -4,7 +4,7 @@ plugins {
   id 'com.brambolt.gradle.testkit' version 'SNAPSHOT' apply false
 }
 
-description = 'A Gradle plug-in for creating and applying patch files using Google\'s diffutils library.'
+description = 'A Gradle plugin for creating and applying patch files using the Googles diffutils library.'
 group = 'com.brambolt.gradle'
 
 ext {
@@ -32,11 +32,49 @@ ext {
 apply plugin: 'com.brambolt.gradle.pluginbuild'
 apply plugin: 'com.brambolt.gradle.testkit'
 
+sourceSets {
+  test {
+    resources {
+      srcDir 'src/testInt/fixture2'
+    }
+  }
+}
+
 dependencies {
   implementation 'com.googlecode.java-diff-utils:diffutils:1.3.0'
+  implementation 'com.brambolt:brambolt-rt:SNAPSHOT'
   testImplementation 'com.brambolt.gradle:brambolt-gradle-testkit:SNAPSHOT'
 }
 
-processFixtures {
-  fixtures = ['fixture2']
+processTestFixtures {
+  fixtures = ['src/test/fixture2']
+  destinationDir = "${project.buildDir}/resources/test"
+}
+
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
+test {
+  testLogging {
+    events TestLogEvent.FAILED,
+      TestLogEvent.PASSED,
+      TestLogEvent.SKIPPED,
+      TestLogEvent.STANDARD_OUT
+    exceptionFormat TestExceptionFormat.FULL
+    showExceptions true
+    showCauses true
+    showStackTraces true
+    showStandardStreams true
+    debug {
+      events TestLogEvent.STARTED,
+        TestLogEvent.FAILED,
+        TestLogEvent.PASSED,
+        TestLogEvent.SKIPPED,
+        TestLogEvent.STANDARD_ERROR,
+        TestLogEvent.STANDARD_OUT
+      exceptionFormat TestExceptionFormat.FULL
+    }
+    info.events = debug.events
+    info.exceptionFormat = debug.exceptionFormat
+  }
 }

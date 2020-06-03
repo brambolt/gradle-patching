@@ -1,0 +1,9 @@
+--- src/vendor/resources/resource1.txt	2020-06-03 22:49:14.268093953 +0200
++++ resource1.txt	2020-06-03 22:52:00.344414607 +0200
+@@ -3,4 +3,6 @@
+ 
+ Some more text.
+ 
++Weit draußen in den unerforschten Einöden eines total aus der Mode gekommenen Ausläufers des westlichen Spiralarms der Galaxis leuchtet unbeachtet eine kleine gelbe Sonne.
++
+ Even more text.

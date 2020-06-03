@@ -1,0 +1,17 @@
+--- content/standalone/configuration/standalone.xml	2020-05-27 08:49:33.058495324 +0200
++++ expected/standalone/configuration/standalone.xml	2020-05-27 08:59:22.777533347 +0200
+@@ -153,6 +153,14 @@
+                         <password>sa</password>
+                     </security>
+                 </datasource>
++                <datasource jndi-name="java:jboss/datasources/ExampleDS2" pool-name="ExampleDS2" enabled="true" use-java-context="true">
++                    <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
++                    <driver>h2</driver>
++                    <security>
++                        <user-name>sa</user-name>
++                        <password>sa</password>
++                    </security>
++                </datasource>
+                 <drivers>
+                     <driver name="h2" module="com.h2database.h2">
+                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>

@@ -3,9 +3,9 @@ package com.brambolt.gradle.patching.tasks
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 
-import static com.brambolt.gradle.SpecObjects.getFile
+import static com.brambolt.gradle.SpecObjects.asFile
 
-class ProcessPatchesSpec extends Specification {
+class ProcessPatchesSpec1 extends Specification {
 
   def 'can define task with patch path'() {
     given:
@@ -13,7 +13,7 @@ class ProcessPatchesSpec extends Specification {
     when:
     task.patch = "${System.getProperty('java.tmp.dir')}/file.patch"
     then:
-    getFile('patch', task.patch) instanceof File
+    asFile('patch', task.patch) instanceof File
   }
 
   def 'can define task with patch file'() {
@@ -22,7 +22,7 @@ class ProcessPatchesSpec extends Specification {
     when:
     task.patch = new File("${System.getProperty('java.tmp.dir')}/file.patch")
     then:
-    getFile('patch', task.patch) == task.patch
+    asFile('patch', task.patch) == task.patch
   }
 
   def 'can define task with patch closure'() {
@@ -31,6 +31,6 @@ class ProcessPatchesSpec extends Specification {
     when:
     task.patch = { "${System.getProperty('java.tmp.dir')}/file.patch" }
     then:
-    getFile('patch', task.patch) instanceof File
+    asFile('patch', task.patch) instanceof File
   }
 }

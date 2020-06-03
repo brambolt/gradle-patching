@@ -1,5 +1,5 @@
---- content/bin/standalone.sh	2020-06-03 21:21:36.733553531 +0200
-+++ expected/bin/standalone.sh	2020-06-03 21:21:38.741553590 +0200
+--- content/standalone.sh	2020-06-03 21:14:32.765149040 +0200
++++ expected/standalone.sh	2020-06-03 21:16:26.037265392 +0200
 @@ -21,6 +21,12 @@
  echo ""
  echo "  JAVA_OPTS: $JAVA_OPTS"

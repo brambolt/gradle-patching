@@ -1,0 +1,22 @@
+
+plugins {
+  id 'application'
+  id 'com.brambolt.gradle.patching' version 'SNAPSHOT'
+}
+
+processPatches {
+  content = "${project.projectDir}/src/vendor/resources"
+  patches = "${project.projectDir}/src/main/diffs"
+  destination = processResources.destinationDir
+  doLast {
+    File res1After = new File(destination, 'resource1.txt')
+    File res1Before = new File(content, 'resource1.txt')
+    if (!res1After.exists())
+      throw new GradleException("Content not processed: ${res1After}")
+    if (res1Before.text == res1After.text)
+      throw new GradleException("Patch not applied: ${res1After}")
+    if (!res1After.text.contains('total aus der Mode'))
+      throw new GradleException("Patching failed: ${res1After}")
+  }
+}
+

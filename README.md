@@ -1,3 +1,3 @@
 
-This is a simple convenience plugin that wraps Google's `diffutils` library. 
+A Gradle plugin for creating and applying patch files using the Google `diffutils` library. 
 

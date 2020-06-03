@@ -3,11 +3,13 @@ package com.brambolt.gradle.patching
 import difflib.DiffUtils
 import difflib.Patch
 import groovy.io.FileType
-import org.gradle.api.GradleException
+import org.slf4j.Logger
 
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+import org.apache.tools.ant.taskdefs.Copy
+import org.gradle.api.GradleException
 
 /**
  * @see com.brambolt.gradle.patching.tasks.ProcessPatches
@@ -24,6 +26,14 @@ class Patcher {
    * extension by default.
    */
   static final String DEFAULT_DIFF_EXTENSION = '.diff'
+
+  Logger log
+
+  Patcher(Logger log) {
+    if (null == log)
+      throw new IllegalArgumentException('Null logger')
+    this.log = log
+  }
 
   /**
    * Applies the parameter patch(es) to the parameter file(s).
@@ -89,23 +99,33 @@ class Patcher {
         "Patch directory ${patchDir} can't be applied to content at ${contentDir}")
     if (null == destinationDir || !destinationDir.isDirectory())
       throw new GradleException("Not a valid destination directory: ${destinationDir}")
+    if (!diffExtension.startsWith('.'))
+      throw new GradleException(
+        "The diff file extension should start with a preceding '.' (dot), got instead: ${diffExtension}")
+    log.info("Patching content in ${contentDir} with patches in ${patchDir}.")
     List<String> errors = []
-    Path patchRootPath = patchDir.toPath()
-    patchDir.eachFileRecurse(FileType.FILES) { File patchFile ->
-      if (patchFile.name.endsWith(diffExtension)) {
-        String baseNameWithoutExtension = patchFile.name.substring(
-          0, patchFile.name.length() - diffExtension.length())
-        Path relDirPath = patchRootPath.relativize(patchFile.parentFile.toPath())
-        File matchingContentFile = new File(
-          contentDir, "${relDirPath.toString()}/${baseNameWithoutExtension}")
-        File matchingDestinationFile = new File(
-          destinationDir, "${relDirPath.toString()}/${baseNameWithoutExtension}")
-        matchingDestinationFile.parentFile.mkdirs()
-        if (matchingContentFile.exists())
-          errors = applyFile(
-            patchFile, matchingContentFile, charset, matchingDestinationFile, errors)
-      }
+    Path rootPath = contentDir.toPath()
+    contentDir.eachFileRecurse(FileType.FILES) { File contentFile ->
+      errors = visit(patchDir, rootPath, contentFile, diffExtension, charset, destinationDir, errors)
     }
+    errors
+  }
+
+  private List<String> visit(
+    File patchDir, Path rootPath,File contentFile, String diffExtension,
+    Charset charset, File destinationDir, List<String> errors) {
+    log.debug("Visiting ${contentFile}...")
+    Path relDirPath = rootPath.relativize(contentFile.parentFile.toPath())
+    File matchingPatchFile = new File(
+      // The diff extension must start with the dot character:
+      patchDir, "${relDirPath.toString()}/${contentFile.name}${diffExtension}")
+    File matchingDestinationFile = new File(
+      destinationDir, "${relDirPath.toString()}/${contentFile.name}")
+    matchingDestinationFile.parentFile.mkdirs()
+    if (matchingPatchFile.exists())
+      errors = applyFile(
+        matchingPatchFile, contentFile, charset, matchingDestinationFile, errors)
+    else copy(contentFile, matchingDestinationFile)
     errors
   }
 
@@ -138,34 +158,42 @@ class Patcher {
    * Applies a patch file to a content file.
    * @param patchFile A patch file
    * @param contentFile A content file
-   * @param charset The character set in use, defaults to UTF-8
    * @param destinationFile The file to write to
+   * @return The destination file
    */
-  void applyOrThrow(
-    File patchFile, File contentFile, Charset charset, File destinationFile) {
-    applyOrThrow(patchFile, contentFile, destinationFile, charset)
+  File applyOrThrow(
+    File patchFile, File contentFile, File destinationFile) {
+    applyOrThrow(patchFile, contentFile, StandardCharsets.UTF_8, destinationFile)
   }
-
 
   /**
    * Applies a patch file to a content file and produces a destination file.
    * @param patchFile A patch file
    * @param contentFile A content file
-   * @param destinationFile The output file to write to
    * @param charset The character set in use, defaults to UTF-8
+   * @param destinationFile The output file to write to
+   * @return The destination file
    */
-  void applyOrThrow(
-    File patchFile, File contentFile, File destinationFile, Charset charset) {
+  File applyOrThrow(
+    File patchFile, File contentFile, Charset charset, File destinationFile) {
     if (null == patchFile | !patchFile.isFile())
       throw new GradleException("Not a file: ${patchFile}")
     if (null == contentFile || !contentFile.isFile())
       throw new GradleException(
         "Patch file ${patchFile} can't be applied to ${contentFile}")
+    log.info("Patching ${contentFile} with ${patchFile} into ${destinationFile}.")
     List<String> patchLines = getLines(patchFile)
-    List<String> originalLines = getLines(contentFile)
+    List<String> contentLines = getLines(contentFile)
+    List<String> patchedLines = applyOrThrow(patchLines, contentLines)
+    File written = writeLines(patchedLines, destinationFile, charset)
+    log.info("Patched ${contentFile}\n\twith ${patchFile}\n\tinto ${written}.")
+    written
+  }
+
+  List<String> applyOrThrow(
+    List<String> patchLines, List<String> contentLines) {
     Patch<String> patch = DiffUtils.parseUnifiedDiff(patchLines)
-    List<String> patchedLines = patch.applyTo(originalLines)
-    writeLines(patchedLines, destinationFile, charset)
+    patch.applyTo(contentLines)
   }
 
   /**
@@ -174,7 +202,7 @@ class Patcher {
    * @return The lines of the input file
    * @throws IOException If unable to read the file
    */
-  List<String> getLines(String inputPath) {
+  protected List<String> getLines(String inputPath) {
     getLines(new File(inputPath))
   }
 
@@ -184,19 +212,28 @@ class Patcher {
    * @return The lines of the input file
    * @throws IOException If unable to read the file
    */
-  List<String> getLines(File inputFile) {
+  protected List<String> getLines(File inputFile) {
     List<String> result = new ArrayList<>()
     inputFile.eachLine { String line -> result.add(line) }
     result
   }
 
-  void writeLines(List<String> patchedLines, String outputPath, Charset charset) {
+  protected File writeLines(List<String> patchedLines, String outputPath, Charset charset) {
     writeLines(patchedLines, new File(outputPath), charset)
   }
 
-  void writeLines(List<String> patchedLines, File outputFile, Charset charset) {
+  protected File writeLines(List<String> patchedLines, File outputFile, Charset charset) {
     outputFile.withWriter(charset.name()) { writer ->
       patchedLines.each { String line -> writer.writeLine(line) }
     }
+    outputFile
+  }
+
+  protected void copy(File file, File toFile) {
+    Copy copy = new Copy()
+    copy.setFile(file)
+    copy.setTofile(toFile)
+    copy.execute()
+    log.debug("Copied ${file} to ${toFile}.")
   }
 }

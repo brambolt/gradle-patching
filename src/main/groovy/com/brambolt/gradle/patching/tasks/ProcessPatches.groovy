@@ -5,10 +5,11 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskAction
+import org.gradle.language.jvm.tasks.ProcessResources
 
 import java.nio.charset.Charset
 
-import static com.brambolt.gradle.SpecObjects.getFile
+import static com.brambolt.gradle.SpecObjects.asFile
 import static com.brambolt.gradle.patching.Patcher.DEFAULT_CHARSET
 import static com.brambolt.gradle.patching.Patcher.DEFAULT_DIFF_EXTENSION
 
@@ -87,9 +88,31 @@ class ProcessPatches extends DefaultTask {
    */
   Object destination
 
+  /**
+   * Task configuration. If the <code>processResources</code> task is available
+   * then its destination directory is set as the default destination directory.
+   * @param closure The configuration closure
+   * @return The configured task
+   */
   @Override
   Task configure(Closure closure) {
-    super.configure(closure) // No defaults to be applied
+    destination = findDefaultDestinationDir()
+    super.configure(closure)
+  }
+
+  /**
+   * Looks up the destination directory of the <code>processResources</code>
+   * task, if available, or returns null.
+   * @return The destination directory of the process-resource task, or null
+   */
+  File findDefaultDestinationDir() {
+    try {
+      Task t = project.tasks.withType(ProcessResources).named('processResources').getOrElse(null)
+      (null != t) ? (t as ProcessResources).destinationDir : null
+    } catch (Exception x) {
+      project.logger.debug('Unable to look up default destination directory', x)
+      null // Best we can do
+    }
   }
 
   /**
@@ -99,11 +122,11 @@ class ProcessPatches extends DefaultTask {
   void apply() {
     if (null == patches)
       patches = patch
-    File patchFile = getFile('patches', patches)
-    File contentFile = getFile('content', content)
-    File destinationDir = getFile('destination', destination)
+    File patchFile = asFile('patches', patches)
+    File contentFile = asFile('content', content)
+    File destinationDir = asFile('destination', destination)
     project.logger.info("Applying ${patchFile} to ${contentFile}.")
-    List<String> errors = new Patcher().apply(
+    List<String> errors = new Patcher(project.logger).apply(
       patchFile, contentFile, diffExtension, charset, destinationDir)
     if (!errors.isEmpty())
       throw new GradleException("""
