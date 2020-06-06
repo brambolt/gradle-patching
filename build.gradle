@@ -1,7 +1,7 @@
 
 plugins {
-  id 'com.brambolt.gradle.pluginbuild' version '2020.05.25-4031' apply false
-  id 'com.brambolt.gradle.testkit' version 'SNAPSHOT' apply false
+  id 'com.brambolt.gradle.pluginbuild' apply false
+  id 'com.brambolt.gradle.testkit' apply false
 }
 
 description = 'A Gradle plugin for creating and applying patch files using the Googles diffutils library.'
@@ -25,25 +25,17 @@ ext {
   pluginId = 'com.brambolt.gradle.patching'
   pluginTags = ['diffutils', 'unified', 'diff', 'patch']
   pluginWebsite = 'https://github.com/brambolt/gradle-patching'
-  projectVersion = '2020.05.25'
+  projectVersion = bramboltProjectVersion
   vcsUrl = 'https://github.com/brambolt/gradle-patching'
 }
 
 apply plugin: 'com.brambolt.gradle.pluginbuild'
 apply plugin: 'com.brambolt.gradle.testkit'
 
-sourceSets {
-  test {
-    resources {
-      srcDir 'src/testInt/fixture2'
-    }
-  }
-}
-
 dependencies {
-  implementation 'com.googlecode.java-diff-utils:diffutils:1.3.0'
-  implementation 'com.brambolt:brambolt-rt:SNAPSHOT'
-  testImplementation 'com.brambolt.gradle:brambolt-gradle-testkit:SNAPSHOT'
+  implementation "com.googlecode.java-diff-utils:diffutils:${googleDiffutilsVersion}"
+  implementation "com.brambolt:brambolt-rt:${bramboltRtVersion}"
+  testImplementation "com.brambolt.gradle:brambolt-gradle-testkit:${bramboltTestkitVersion}"
 }
 
 processTestFixtures {
