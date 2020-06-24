@@ -8,7 +8,6 @@ description = 'A Gradle plugin for creating and applying patch files using the G
 group = 'com.brambolt.gradle'
 
 ext {
-  artifactId = 'brambolt-gradle-patching'
   developers = [[
     email: 'stefan.sigurdsson@brambolt.com',
     id: 'stefan.sigurdsson@brambolt.com',

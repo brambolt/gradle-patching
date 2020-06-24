@@ -22,7 +22,7 @@ plugins {
 """, testProjectDir)
   }
 
-  static ithDirectories(TemporaryFolder testProjectDir) {
+  static withDirectories(TemporaryFolder testProjectDir) {
     createBuildFile('build-with-directories.gradle', """
 plugins {
   id 'com.brambolt.gradle.patching'
