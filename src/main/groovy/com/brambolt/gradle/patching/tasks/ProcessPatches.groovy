@@ -1,3 +1,7 @@
+/**
+ * Copyright 2017-2020 Brambolt ehf.
+ */
+
 package com.brambolt.gradle.patching.tasks
 
 import com.brambolt.gradle.patching.Patcher
