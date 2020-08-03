@@ -21,8 +21,8 @@ pluginManagement {
     maven { url 'https://dl.bintray.com/brambolt/public' }
   }
   plugins {
-    id 'com.brambolt.gradle.pluginbuild' version bramboltPluginbuildVersion
-    id 'com.brambolt.gradle.testkit' version bramboltTestkitVersion
+    id 'com.brambolt.gradle.build.plugin' version bramboltVersion
+    id 'com.brambolt.gradle.testkit' version bramboltVersion
   }
 }
 

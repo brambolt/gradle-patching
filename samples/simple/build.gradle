@@ -1,7 +1,7 @@
 
 plugins {
   id 'application'
-  id 'com.brambolt.gradle.patching' version 'SNAPSHOT'
+  id 'com.brambolt.gradle.patching' version bramboltVersion
 }
 
 processPatches {

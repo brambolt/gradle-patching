@@ -15,7 +15,7 @@
  */
 
 plugins {
-  id 'com.brambolt.gradle.pluginbuild' apply false
+  id 'com.brambolt.gradle.build.plugin' apply false
   id 'com.brambolt.gradle.testkit' apply false
 }
 
@@ -23,12 +23,14 @@ description = 'A Gradle plugin for creating and applying patch files using the G
 group = 'com.brambolt.gradle'
 
 ext {
+  artifactId = 'brambolt-gradle-patching'
   developers = [[
     email: 'stefan.sigurdsson@brambolt.com',
     id: 'stefan.sigurdsson@brambolt.com',
     name: 'Stefán Sigurðsson'
   ]]
   inceptionYear = '2017'
+  isOpenSource = true // Enables publishing to plugins.gradle.org and Bintray
   licenses = [[
     id: 'Apache-2.0',
     name: 'The Apache Software License, Version 2.0',
@@ -39,17 +41,18 @@ ext {
   pluginId = 'com.brambolt.gradle.patching'
   pluginTags = ['diffutils', 'unified', 'diff', 'patch']
   pluginWebsite = 'https://github.com/brambolt/gradle-patching'
-  projectVersion = bramboltProjectVersion
+  release = bramboltRelease
   vcsUrl = 'https://github.com/brambolt/gradle-patching'
 }
 
-apply plugin: 'com.brambolt.gradle.pluginbuild'
+apply plugin: 'com.brambolt.gradle.build.plugin'
 apply plugin: 'com.brambolt.gradle.testkit'
 
 dependencies {
   implementation "com.googlecode.java-diff-utils:diffutils:${googleDiffutilsVersion}"
-  implementation "com.brambolt:brambolt-rt:${bramboltRtVersion}"
-  testImplementation "com.brambolt.gradle:brambolt-gradle-testkit:${bramboltTestkitVersion}"
+  implementation "com.brambolt:brambolt-rt:${version}"
+  implementation "com.brambolt.gradle:brambolt-gradle-rt:${version}"
+  testImplementation "com.brambolt.gradle:brambolt-gradle-testkit:${version}"
 }
 
 processTestFixtures {
