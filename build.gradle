@@ -30,6 +30,7 @@ ext {
     name: 'Stefán Sigurðsson'
   ]]
   inceptionYear = '2017'
+  isGitHosted = true
   isOpenSource = true // Enables publishing to plugins.gradle.org and Bintray
   licenses = [[
     id: 'Apache-2.0',
