@@ -5,5 +5,5 @@ pluginManagement {
   }
 }
 
-rootProject.name = 'gradle-patching-simple-sample'
+rootProject.name = 'brambolt-gradle-patching-simple-sample'
 

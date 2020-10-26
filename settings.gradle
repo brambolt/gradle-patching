@@ -26,5 +26,5 @@ pluginManagement {
   }
 }
 
-rootProject.name = 'gradle-patching'
+rootProject.name = 'brambolt-gradle-patching'
 
