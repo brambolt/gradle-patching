@@ -2,6 +2,10 @@
 pluginManagement {
   repositories {
     mavenLocal()
+    mavenCentral()
+  }
+  plugins {
+    id 'com.brambolt.gradle.patching' version bramboltVersion
   }
 }
 

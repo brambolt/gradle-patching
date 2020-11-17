@@ -24,8 +24,11 @@ import org.slf4j.Logger
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import org.apache.tools.ant.taskdefs.Copy
 import org.gradle.api.GradleException
+
+import static Files.copy
+import static Lines.getLines
+import static Lines.writeLines
 
 /**
  * @see com.brambolt.gradle.patching.tasks.ProcessPatches
@@ -63,6 +66,17 @@ class Patcher {
 
   /**
    * Applies one or more patches to one or more files.
+   *
+   * <p>If no patch or patch directory is provided, nothing is done.</p>
+   *
+   * <p>If an empty patch directory is provided, everything under the content
+   * directory will be copied to the destination directory without
+   * modification.</p>
+   *
+   * <p>If a patch directory with a set of patches that match some of the files
+   * in the content directory is provided, then the patches will be applied,
+   * and the remaining files will be copied without modification.</p>
+   *
    * @param patchOrPatches A patch file or directory containing patch files
    * @param fileOrFiles A content file or directory containing content files
    * @param diffExtension The file extension that identifies the patch files
@@ -128,10 +142,10 @@ class Patcher {
   }
 
   private List<String> visit(
-    File patchDir, Path rootPath,File contentFile, String diffExtension,
+    File patchDir, Path rootContentPath, File contentFile, String diffExtension,
     Charset charset, File destinationDir, List<String> errors) {
     log.debug("Visiting ${contentFile}...")
-    Path relDirPath = rootPath.relativize(contentFile.parentFile.toPath())
+    Path relDirPath = rootContentPath.relativize(contentFile.parentFile.toPath())
     File matchingPatchFile = new File(
       // The diff extension must start with the dot character:
       patchDir, "${relDirPath.toString()}/${contentFile.name}${diffExtension}")
@@ -141,7 +155,7 @@ class Patcher {
     if (matchingPatchFile.exists())
       errors = applyFile(
         matchingPatchFile, contentFile, charset, matchingDestinationFile, errors)
-    else copy(contentFile, matchingDestinationFile)
+    else copy(contentFile, matchingDestinationFile, log)
     errors
   }
 
@@ -210,46 +224,5 @@ class Patcher {
     List<String> patchLines, List<String> contentLines) {
     Patch<String> patch = DiffUtils.parseUnifiedDiff(patchLines)
     patch.applyTo(contentLines)
-  }
-
-  /**
-   * Returns the lines of the file at the input path.
-   * @param inputPath The input path to read from
-   * @return The lines of the input file
-   * @throws IOException If unable to read the file
-   */
-  protected List<String> getLines(String inputPath) {
-    getLines(new File(inputPath))
-  }
-
-  /**
-   * Returns the lines of the parameter file.
-   * @param inputFile The input file to read from
-   * @return The lines of the input file
-   * @throws IOException If unable to read the file
-   */
-  protected List<String> getLines(File inputFile) {
-    List<String> result = new ArrayList<>()
-    inputFile.eachLine { String line -> result.add(line) }
-    result
-  }
-
-  protected File writeLines(List<String> patchedLines, String outputPath, Charset charset) {
-    writeLines(patchedLines, new File(outputPath), charset)
-  }
-
-  protected File writeLines(List<String> patchedLines, File outputFile, Charset charset) {
-    outputFile.withWriter(charset.name()) { writer ->
-      patchedLines.each { String line -> writer.writeLine(line) }
-    }
-    outputFile
-  }
-
-  protected void copy(File file, File toFile) {
-    Copy copy = new Copy()
-    copy.setFile(file)
-    copy.setTofile(toFile)
-    copy.execute()
-    log.debug("Copied ${file} to ${toFile}.")
   }
 }

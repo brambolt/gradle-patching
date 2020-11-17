@@ -1,0 +1,11 @@
+
+task runSimple(type: Exec) {
+  workingDir = new File(projectDir, 'simple')
+  commandLine(['../../gradlew', 'processPatches', 'createPatches',
+               '--no-daemon', '--stacktrace',
+               "-PbramboltVersion=${bramboltVersion}"])
+}
+
+task runAll {
+  dependsOn(runSimple)
+}

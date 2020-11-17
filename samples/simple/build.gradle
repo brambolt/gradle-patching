@@ -1,16 +1,17 @@
 
 plugins {
   id 'application'
-  id 'com.brambolt.gradle.patching' version bramboltVersion
+  id 'com.brambolt.gradle.patching'
 }
 
 processPatches {
-  content = "${project.projectDir}/src/vendor/resources"
-  patches = "${project.projectDir}/src/main/diffs"
+  content = "${projectDir}/src/vendor/resources"
+  patches = "${projectDir}/src/main/diffs"
   destination = processResources.destinationDir
   doLast {
-    File res1After = new File(destination, 'resource1.txt')
-    File res1Before = new File(content, 'resource1.txt')
+    String baseName = 'resource1.txt'
+    File res1After = new File(destination, baseName)
+    File res1Before = new File(content, baseName)
     if (!res1After.exists())
       throw new GradleException("Content not processed: ${res1After}")
     if (res1Before.text == res1After.text)
@@ -20,3 +21,20 @@ processPatches {
   }
 }
 
+createPatches {
+  content = "${projectDir}/src/vendor/resources"
+  modified = processPatches.destination
+  destination = "${buildDir}/patches"
+  doLast {
+    String baseName = 'resource1.txt.diff'
+    File patch1After = new File(destination, baseName)
+    File patch1Before = new File(processPatches.patches, baseName)
+    if (!patch1After.exists())
+      throw new GradleException("Patch not produced: ${patch1After}")
+    // We can't do this comparison because the timestamps are different etc.:
+    // if (patch1Before.text != patch1After.text)
+      // throw new GradleException("Patch not correctly generated: ${patch1After}")
+    if (!patch1After.text.contains('in den unerforschten'))
+      throw new GradleException("Patch generation failed: ${patch1After}")
+  }
+}

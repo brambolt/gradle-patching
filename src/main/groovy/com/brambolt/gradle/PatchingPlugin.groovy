@@ -16,6 +16,7 @@
 
 package com.brambolt.gradle
 
+import com.brambolt.gradle.patching.tasks.CreatePatches
 import com.brambolt.gradle.patching.tasks.ProcessPatches
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -54,8 +55,16 @@ class PatchingPlugin implements Plugin<Project> {
    */
   void apply(Project project) {
     project.logger.debug("Applying ${getClass().getCanonicalName()}.")
+    createCreatePatchesTask(project)
     Task processPatches = createProcessPatchesTask(project)
     configureDefaultTaskDependencies(project, processPatches)
+  }
+
+  protected Task createCreatePatchesTask(Project project) {
+    project.task(
+      // Apply an empty configuration closure to set defaults, if any:
+      [type: CreatePatches], 'createPatches') {}
+
   }
 
   protected Task createProcessPatchesTask(Project project) {

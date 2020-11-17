@@ -59,11 +59,17 @@ import static com.brambolt.gradle.patching.Patcher.DEFAULT_DIFF_EXTENSION
  * is going to be applied to <code>e.txt</code>, and this generates the
  * file with the same name in the destination directory.</p>
  *
- * The diff utils library works on a line-by-line basis. The task therefore
+ * <p>The diff utils library works on a line-by-line basis. The task therefore
  * has to split the input files on newlines and recombine after patch processing.
  * There is no attempt to produce exactly the same line endings. In particular,
  * the output files will include always newlines before EOF, irrespective of
- * whether the input data does or not.
+ * whether the input data does or not.</p>
+ *
+ * <p>When the patch file or directory points nowhere, the task does nothing.
+ * But when the patch directory is empty, everything under the content
+ * directory is copied without modification. If the task is not doing anything,
+ * check whether the configured patch directory exists, and create it if it is
+ * missing.</p>
  */
 class ProcessPatches extends DefaultTask {
 

@@ -88,3 +88,5 @@ test {
     info.exceptionFormat = debug.exceptionFormat
   }
 }
+
+test.finalizedBy(':samples:runAll')

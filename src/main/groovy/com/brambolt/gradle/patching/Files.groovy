@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-pluginManagement {
-  repositories {
-    mavenLocal()
-    gradlePluginPortal()
-    maven { url 'https://dl.bintray.com/brambolt/public' }
-  }
-  plugins {
-    id 'com.brambolt.gradle.build.plugin' version bramboltVersion
-    id 'com.brambolt.gradle.testkit' version bramboltVersion
+package com.brambolt.gradle.patching
+
+import org.apache.tools.ant.taskdefs.Copy
+import org.slf4j.Logger
+
+/**
+ * Utilities.
+ */
+class Files {
+
+  static void copy(File file, File toFile, Logger log) {
+    Copy copy = new Copy()
+    copy.setFile(file)
+    copy.setTofile(toFile)
+    copy.execute()
+    log.debug("Copied ${file} to ${toFile}.")
   }
 }
-
-rootProject.name = 'brambolt-gradle-patching'
-
-include 'samples'
-
