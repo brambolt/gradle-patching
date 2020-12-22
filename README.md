@@ -6,6 +6,21 @@ Instructions for applying the plugin are at
 
   https://plugins.gradle.org/plugin/com.brambolt.gradle.patching
 
+A repository declaration for Bintray is also needed, in a snippet like this in 
+the project's `settings.gradle` (where `bramboltVersion` is the version in use):
+
+```
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    maven { url 'https://dl.bintray.com/brambolt/public' }
+  }
+  plugins {
+    id 'com.brambolt.gradle.patching' version bramboltVersion
+  }
+}
+```
+
 The easiest way to use the plugin is to configure the `processPatches` task with 
 directories to locate patches and the content to apply them to, for example:
 ```
